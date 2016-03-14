@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void loggout(View view){
+    public void logout(View view){
         Firebase firebase = LibraryClass.getFirebase();
         firebase.unauth();
 
