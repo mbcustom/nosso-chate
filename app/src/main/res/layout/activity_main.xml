@@ -9,7 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="br.com.thiengo.thiengocalopsitafbexample.MainActivity">
 
-
     <android.support.v7.widget.RecyclerView
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -17,5 +16,4 @@
         android:id="@+id/rv_users"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
 </RelativeLayout>

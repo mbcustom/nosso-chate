@@ -45,10 +45,12 @@ public class MainActivity extends AppCompatActivity {
         rvUsers.setHasFixedSize( true );
         rvUsers.setLayoutManager( new LinearLayoutManager(this));
 
-        adapter = new UserRecyclerAdapter( User.class, android.R.layout.two_line_list_item, UserViewHolder.class, firebase);
-        rvUsers.setAdapter( adapter );
+        adapter = new UserRecyclerAdapter(
+                User.class,
+                android.R.layout.two_line_list_item,
+                UserViewHolder.class,
+                firebase );
     }
-
 
     @Override
     protected void onDestroy() {

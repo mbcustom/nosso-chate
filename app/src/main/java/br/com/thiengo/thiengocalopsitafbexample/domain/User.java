@@ -2,10 +2,10 @@ package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.client.Firebase;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"id", "password"})
 public class User {
@@ -76,10 +76,8 @@ public class User {
 
 
     public void saveDB(){
-
         Firebase firebase = LibraryClass.getFirebase();
         firebase = firebase.child("users").child( getId() );
-
         firebase.setValue(this);
     }
 }
