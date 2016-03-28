@@ -1,13 +1,13 @@
 package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.client.Firebase;
-
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
+@JsonIgnoreProperties({"id", "password"})
 public class User {
     public static String TOKEN = "br.com.thiengo.thiengocalopsitafbexample.domain.User.TOKEN";
 
@@ -20,6 +20,7 @@ public class User {
     public User(){}
 
 
+
     public String getId() {
         return id;
     }
@@ -27,6 +28,7 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
+
 
 
     public String getName() {
@@ -38,6 +40,7 @@ public class User {
     }
 
 
+
     public String getEmail() {
         return email;
     }
@@ -45,6 +48,7 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
 
 
     public String getPassword() {
@@ -66,17 +70,16 @@ public class User {
     }
 
     public String getTokenSP(Context context ){
-        String token = LibraryClass.getSP( context, TOKEN );
-        return( token );
+        return( LibraryClass.getSP( context, TOKEN ) );
     }
 
 
+
     public void saveDB(){
+
         Firebase firebase = LibraryClass.getFirebase();
         firebase = firebase.child("users").child( getId() );
 
-        setPassword(null);
-        setId(null);
-        firebase.setValue( this );
+        firebase.setValue(this);
     }
 }
