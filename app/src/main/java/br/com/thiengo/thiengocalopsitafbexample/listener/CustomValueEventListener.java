@@ -1,9 +1,11 @@
 package br.com.thiengo.thiengocalopsitafbexample.listener;
 
 import android.util.Log;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 
 

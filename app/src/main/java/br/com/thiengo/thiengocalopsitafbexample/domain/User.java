@@ -2,16 +2,15 @@ package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
-import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.firebase.client.FirebaseError;
+import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
+import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 @JsonIgnoreProperties({"id", "password"})
 public class User {
