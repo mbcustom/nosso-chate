@@ -69,6 +69,7 @@ public class LoginActivity extends CommonActivity {
                         @Override
                         public void onAuthenticated(AuthData authData) {
                             user.saveTokenSP( LoginActivity.this, authData.getToken() );
+                            user.saveIdSP( LoginActivity.this, authData.getUid() );
                             callMainActivity();
                         }
 
@@ -95,6 +96,7 @@ public class LoginActivity extends CommonActivity {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     user.saveTokenSP( LoginActivity.this, authData.getToken() );
+                    user.saveIdSP( LoginActivity.this, authData.getUid() );
                     closeProgressBar();
                     callMainActivity();
                 }

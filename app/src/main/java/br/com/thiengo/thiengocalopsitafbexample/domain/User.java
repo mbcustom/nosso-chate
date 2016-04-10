@@ -2,19 +2,27 @@ package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonIgnoreProperties({"id", "password"})
 public class User {
     public static String TOKEN = "br.com.thiengo.thiengocalopsitafbexample.domain.User.TOKEN";
+    public static String ID = "br.com.thiengo.thiengocalopsitafbexample.domain.User.ID";
 
     private String id;
     private String name;
     private String email;
     private String password;
+
 
 
     public User(){}
@@ -29,6 +37,14 @@ public class User {
         this.id = id;
     }
 
+    public void saveIdSP(Context context, String token ){
+        LibraryClass.saveSP( context, ID, token );
+    }
+
+    public void retrieveIdSP(Context context ){
+        this.id = LibraryClass.getSP( context, ID );
+    }
+
 
 
     public String getName() {
@@ -39,6 +55,12 @@ public class User {
         this.name = name;
     }
 
+    private void setNameInMap( Map<String, Object> map ) {
+        if( getName() != null ){
+            map.put( "name", getName() );
+        }
+    }
+
 
 
     public String getEmail() {
@@ -47,6 +69,12 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    private void setEmailInMap( Map<String, Object> map ) {
+        if( getEmail() != null ){
+            map.put( "email", getEmail() );
+        }
     }
 
 
@@ -76,8 +104,35 @@ public class User {
 
 
     public void saveDB(){
-        Firebase firebase = LibraryClass.getFirebase();
-        firebase = firebase.child("users").child( getId() );
+        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
         firebase.setValue(this);
+    }
+
+    public void updateDB( Firebase.CompletionListener... completionListener ){
+
+        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+
+        Map<String, Object> map = new HashMap<>();
+        setNameInMap(map);
+        setEmailInMap(map);
+
+        if( map.isEmpty() ){
+            return;
+        }
+
+
+        if( completionListener != null && completionListener[0] != null ){
+            firebase.updateChildren(map, completionListener[0]);
+        }
+        else{
+            firebase.updateChildren(map);
+        }
+    }
+
+    public void contextDataDB( Context context ){
+        retrieveIdSP( context );
+        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+
+        firebase.addListenerForSingleValueEvent( (ValueEventListener) context );
     }
 }

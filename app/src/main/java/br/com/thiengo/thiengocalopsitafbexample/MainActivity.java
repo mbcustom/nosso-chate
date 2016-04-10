@@ -13,15 +13,11 @@ import br.com.thiengo.thiengocalopsitafbexample.adapter.UserRecyclerAdapter;
 import br.com.thiengo.thiengocalopsitafbexample.adapter.UserViewHolder;
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
-import br.com.thiengo.thiengocalopsitafbexample.listener.CustomChildEventListener;
-import br.com.thiengo.thiengocalopsitafbexample.listener.CustomValueEventListener;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private Firebase firebase;
-    private CustomValueEventListener customValueEventListener;
-    private CustomChildEventListener customChildEventListener;
     private UserRecyclerAdapter adapter;
 
 
@@ -50,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.two_line_list_item,
                 UserViewHolder.class,
                 firebase );
+
+        rvUsers.setAdapter(adapter);
     }
 
     @Override
