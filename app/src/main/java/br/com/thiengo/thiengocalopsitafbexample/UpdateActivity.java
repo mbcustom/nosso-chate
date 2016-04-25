@@ -20,7 +20,6 @@ public class UpdateActivity extends AppCompatActivity implements ValueEventListe
     private User user;
     private AutoCompleteTextView name;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,29 +29,24 @@ public class UpdateActivity extends AppCompatActivity implements ValueEventListe
         setSupportActionBar(toolbar);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         init();
     }
 
-
     private void init(){
-        toolbar.setTitle( getResources().getString(R.string.atualizar) );
+        toolbar.setTitle( getResources().getString(R.string.update_profile) );
         name = (AutoCompleteTextView) findViewById(R.id.name);
         user = new User();
         user.contextDataDB( this );
     }
 
-
     public void update( View view ){
-        user.retrieveIdSP( this );
+        user.retrieveIdSP( UpdateActivity.this );
         user.setName( name.getText().toString() );
-        user.updateDB( this );
+        user.updateDB( UpdateActivity.this );
     }
-
-
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {

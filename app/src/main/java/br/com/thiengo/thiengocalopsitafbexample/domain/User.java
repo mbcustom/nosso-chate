@@ -12,7 +12,7 @@ import java.util.Map;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
-@JsonIgnoreProperties({"id", "password"})
+@JsonIgnoreProperties({"id", "password", "newPassword"})
 public class User {
     public static String TOKEN = "br.com.thiengo.thiengocalopsitafbexample.domain.User.TOKEN";
     public static String ID = "br.com.thiengo.thiengocalopsitafbexample.domain.User.ID";
@@ -21,7 +21,7 @@ public class User {
     private String name;
     private String email;
     private String password;
-
+    private String newPassword;
 
 
     public User(){}
@@ -92,6 +92,20 @@ public class User {
 
 
 
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public void generateCryptNewPassword() {
+        newPassword = CryptWithMD5.cryptWithMD5(newPassword);
+    }
+    
+
+
     public void saveTokenSP(Context context, String token ){
         LibraryClass.saveSP( context, TOKEN, token );
     }
@@ -120,12 +134,17 @@ public class User {
         }
 
 
-        if( completionListener != null && completionListener[0] != null ){
+        if( completionListener.length > 0 ){
             firebase.updateChildren(map, completionListener[0]);
         }
         else{
             firebase.updateChildren(map);
         }
+    }
+
+    public void removeDB(){
+        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+        firebase.setValue(null);
     }
 
     public void contextDataDB( Context context ){

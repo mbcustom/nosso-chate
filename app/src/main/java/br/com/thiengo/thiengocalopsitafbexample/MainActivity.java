@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 
 import br.com.thiengo.thiengocalopsitafbexample.adapter.UserRecyclerAdapter;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Firebase firebase;
     private UserRecyclerAdapter adapter;
+    private Firebase.AuthStateListener authStateListener;
 
 
     @Override
@@ -27,7 +29,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        authStateListener = new Firebase.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(AuthData authData) {
+                if( authData == null ){
+                    Intent intent = new Intent( MainActivity.this, LoginActivity.class );
+                    startActivity( intent );
+                    finish();
+                }
+            }
+        };
+
         firebase = LibraryClass.getFirebase().child("users");
+        firebase.addAuthStateListener( authStateListener );
     }
 
 
@@ -55,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         adapter.cleanup();
+        firebase.removeAuthStateListener( authStateListener );
     }
 
 
@@ -71,6 +86,15 @@ public class MainActivity extends AppCompatActivity {
 
         if(id == R.id.action_update){
             startActivity(new Intent(this, UpdateActivity.class));
+        }
+        else if(id == R.id.action_update_login){
+            startActivity(new Intent(this, UpdateLoginActivity.class));
+        }
+        else if(id == R.id.action_update_password){
+            startActivity(new Intent(this, UpdatePasswordActivity.class));
+        }
+        else if(id == R.id.action_remove_user){
+            startActivity(new Intent(this, RemoveUserActivity.class));
         }
         else if(id == R.id.action_logout){
             firebase.unauth();

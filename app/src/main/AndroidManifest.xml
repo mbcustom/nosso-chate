@@ -34,7 +34,19 @@
         <activity
             android:name=".UpdateActivity"
             android:label="@string/title_activity_update"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".UpdateLoginActivity"
+            android:label="@string/title_activity_update_login"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".UpdatePasswordActivity"
+            android:label="@string/title_activity_update_password"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".RemoveUserActivity"
+            android:label="@string/title_activity_remove_user"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

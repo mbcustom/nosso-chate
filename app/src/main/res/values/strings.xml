@@ -7,6 +7,7 @@
     <string name="prompt_name">Nome</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Senha</string>
+    <string name="prompt_new_password">Nova senha</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_up">Cadastrar</string>
     <string name="action_sign_up_call">Cadastrar</string>
@@ -19,8 +20,16 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="atualizar">Atualizar</string>
+    <string name="update_profile">Atualizar profile</string>
+    <string name="update_login">Atualizar login</string>
+    <string name="update_password">Atualizar senha</string>
+    <string name="remove_user">Remover conta</string>
     <string name="logout">Logout</string>
     <string name="title_activity_update">UpdateActivity</string>
+    <string name="title_activity_update_login">UpdateLoginActivity</string>
+    <string name="title_activity_update_password">UpdatePasswordActivity</string>
+    <string name="title_activity_remove_user">RemoveUserActivity</string>
+    <string name="new_password_info">Somente forneça o dado de Nova senha abaixo se você realmente for atualizá-la.</string>
+    <string name="password_info">Para prosseguir com a atualização informe abaixo sua senha.</string>
 
 </resources>
