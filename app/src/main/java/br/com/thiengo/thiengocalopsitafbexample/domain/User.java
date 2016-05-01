@@ -44,6 +44,11 @@ public class User {
         this.id = LibraryClass.getSP( context, ID );
     }
 
+    public boolean isSocialNetworkLogged( Context context ){
+        retrieveIdSP( context );
+        return( this.id.contains("facebook") );
+    }
+
 
 
     public String getName() {
@@ -103,7 +108,7 @@ public class User {
     public void generateCryptNewPassword() {
         newPassword = CryptWithMD5.cryptWithMD5(newPassword);
     }
-    
+
 
 
     public void saveTokenSP(Context context, String token ){

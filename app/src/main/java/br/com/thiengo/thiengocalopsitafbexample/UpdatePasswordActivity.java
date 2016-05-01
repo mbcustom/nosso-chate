@@ -16,7 +16,6 @@ import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 public class UpdatePasswordActivity extends AppCompatActivity implements ValueEventListener {
-
     private Toolbar toolbar;
     private User user;
     private EditText newPassword;
@@ -41,13 +40,11 @@ public class UpdatePasswordActivity extends AppCompatActivity implements ValueEv
         toolbar.setTitle( getResources().getString(R.string.update_password) );
         newPassword = (EditText) findViewById(R.id.new_password);
         password = (EditText) findViewById(R.id.password);
-
         user = new User();
         user.contextDataDB( this );
     }
 
     public void update( View view ){
-
         user.setNewPassword( newPassword.getText().toString() );
         user.generateCryptNewPassword();
         user.setPassword( password.getText().toString() );
@@ -55,20 +52,28 @@ public class UpdatePasswordActivity extends AppCompatActivity implements ValueEv
 
         Firebase firebase = LibraryClass.getFirebase();
         firebase.changePassword(
-                user.getEmail(),
-                user.getPassword(),
-                user.getNewPassword(),
-                new Firebase.ResultHandler() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText( UpdatePasswordActivity.this, "Senha atualizada com sucesso", Toast.LENGTH_SHORT ).show();
-                    }
-
-                    @Override
-                    public void onError(FirebaseError firebaseError) {
-                        Toast.makeText( UpdatePasswordActivity.this, firebaseError.getMessage(), Toast.LENGTH_SHORT ).show();
-                    }
+            user.getEmail(),
+            user.getPassword(),
+            user.getNewPassword(),
+            new Firebase.ResultHandler() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(
+                        UpdatePasswordActivity.this,
+                        "Senha atualizada com sucesso",
+                        Toast.LENGTH_SHORT
+                    ).show();
                 }
+
+                @Override
+                public void onError(FirebaseError firebaseError) {
+                    Toast.makeText(
+                        UpdatePasswordActivity.this,
+                        firebaseError.getMessage(),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
         );
     }
 

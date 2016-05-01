@@ -50,22 +50,30 @@ public class RemoveUserActivity extends AppCompatActivity implements ValueEventL
 
         Firebase firebase = LibraryClass.getFirebase();
         firebase.removeUser(
-                user.getEmail(),
-                user.getPassword(),
-                new Firebase.ResultHandler() {
-                    @Override
-                    public void onSuccess() {
-                        user.retrieveIdSP( RemoveUserActivity.this );
-                        user.removeDB();
-                        Toast.makeText( RemoveUserActivity.this, "Conta removida com sucesso", Toast.LENGTH_SHORT ).show();
-                        finish();
-                    }
-
-                    @Override
-                    public void onError(FirebaseError firebaseError) {
-                        Toast.makeText( RemoveUserActivity.this, firebaseError.getMessage(), Toast.LENGTH_SHORT ).show();
-                    }
+            user.getEmail(),
+            user.getPassword(),
+            new Firebase.ResultHandler() {
+                @Override
+                public void onSuccess() {
+                    user.retrieveIdSP( RemoveUserActivity.this );
+                    user.removeDB();
+                    Toast.makeText(
+                        RemoveUserActivity.this,
+                        "Conta removida com sucesso",
+                        Toast.LENGTH_SHORT
+                    ).show();
+                    finish();
                 }
+
+                @Override
+                public void onError(FirebaseError firebaseError) {
+                    Toast.makeText(
+                        RemoveUserActivity.this,
+                        firebaseError.getMessage(),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
         );
     }
 

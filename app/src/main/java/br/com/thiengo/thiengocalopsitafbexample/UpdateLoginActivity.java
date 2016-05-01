@@ -17,7 +17,6 @@ import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 public class UpdateLoginActivity extends AppCompatActivity implements ValueEventListener {
-
     private Toolbar toolbar;
     private User user;
     private AutoCompleteTextView newEmail;
@@ -62,12 +61,20 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
             public void onSuccess() {
                 user.setEmail( newEmail.getText().toString() );
                 user.updateDB();
-                Toast.makeText( UpdateLoginActivity.this, "Email de login atualizado com sucesso", Toast.LENGTH_SHORT ).show();
+                Toast.makeText(
+                    UpdateLoginActivity.this,
+                    "Email de login atualizado com sucesso",
+                    Toast.LENGTH_SHORT
+                ).show();
             }
 
             @Override
             public void onError(FirebaseError firebaseError) {
-                Toast.makeText( UpdateLoginActivity.this, firebaseError.getMessage(), Toast.LENGTH_SHORT ).show();
+                Toast.makeText(
+                    UpdateLoginActivity.this,
+                    firebaseError.getMessage(),
+                    Toast.LENGTH_SHORT
+                ).show();
             }
         });
     }

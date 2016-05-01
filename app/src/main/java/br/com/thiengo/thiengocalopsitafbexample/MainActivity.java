@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.login.LoginManager;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 
@@ -76,7 +77,14 @@ public class MainActivity extends AppCompatActivity {
     // MENU
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        User user = new User();
+
+        if( user.isSocialNetworkLogged( this ) ){
+            getMenuInflater().inflate(R.menu.menu_social_network_logged, menu);
+        }
+        else{
+            getMenuInflater().inflate(R.menu.menu, menu);
+        }
         return true;
     }
 
@@ -99,8 +107,7 @@ public class MainActivity extends AppCompatActivity {
         else if(id == R.id.action_logout){
             firebase.unauth();
 
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+            LoginManager.getInstance().logOut();
             finish();
         }
 
