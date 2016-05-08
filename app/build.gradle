@@ -1,4 +1,24 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+Properties props = new Properties()
+try {
+    props.load(file('crashlytics.properties').newDataInputStream())
+} catch (Exception ex) {
+    throw new GradleException("Missing crashlytics.properties, check the crashlytics.properties.sample file.");
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -12,6 +32,8 @@ android {
     }
     buildTypes {
         release {
+            buildConfigField "String", "CONSUMER_KEY", "\"${props.getProperty("twitterConsumerKey")}\""
+            buildConfigField "String", "CONSUMER_SECRET", "\"${props.getProperty("twitterConsumerSecret")}\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -19,6 +41,8 @@ android {
 }
 repositories {
     mavenCentral()
+    maven { url "https://maven.fabric.io/repo" }
+    maven { url 'https://maven.fabric.io/public' }
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -28,4 +52,10 @@ dependencies {
     compile 'com.firebase:firebase-client-android:2.5.2+'
     compile 'com.firebaseui:firebase-ui:0.3.1'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile('com.twitter.sdk.android:twitter:1.13.1@aar') {
+        transitive = true;
+    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
+        transitive = true;
+    }
 }
