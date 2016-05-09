@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "171568304808",
+    "project_id": "nosso-chat-firebase-1305"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171568304808:android:48f9afebc5157a36",
+        "android_client_info": {
+          "package_name": "br.com.thiengo.thiengocalopsitafbexample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171568304808-jrebl6sc51rqrlttcmamdko1cphjta2g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.thiengo.thiengocalopsitafbexample",
+            "certificate_hash": "C3E1B4C03E982C7DB12DFA9E8EF0658958241A65"
+          }
+        },
+        {
+          "client_id": "171568304808-ghssneo9p2c2pbp9khv370vgr6mg9o4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ENHFgmCxTqp3oUBHYfHXzdNklKvB4LA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

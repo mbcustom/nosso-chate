@@ -46,7 +46,7 @@ public class User {
 
     public boolean isSocialNetworkLogged( Context context ){
         retrieveIdSP( context );
-        return( this.id.contains("facebook") );
+        return( this.id.contains("facebook") || this.id.contains("google") );
     }
 
 

@@ -10,6 +10,7 @@
     <string name="prompt_new_password">Nova senha</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_facebook">Sign in com Facebook</string>
+    <string name="action_sign_in_google">Sign in com Google</string>
     <string name="action_sign_up">Cadastrar</string>
     <string name="action_sign_up_call">Cadastrar</string>
     <string name="action_sign_in_short">Sign in</string>
