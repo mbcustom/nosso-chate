@@ -3,7 +3,6 @@ package br.com.thiengo.thiengocalopsitafbexample;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -27,9 +26,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
@@ -44,6 +50,8 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     private CallbackManager callbackManager;
     private GoogleApiClient mGoogleApiClient;
 
+    private TwitterAuthClient twitterAuthClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,34 +59,38 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
         setContentView(R.layout.activity_login);
 
         // FACEBOOK
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            callbackManager = CallbackManager.Factory.create();
-            LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-                @Override
-                public void onSuccess(LoginResult loginResult) {
-                    accessFacebookLoginData( loginResult.getAccessToken() );
-                }
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                accessFacebookLoginData( loginResult.getAccessToken() );
+            }
 
-                @Override
-                public void onCancel() {}
+            @Override
+            public void onCancel() {}
 
-                @Override
-                public void onError(FacebookException error) {
-                    showSnackbar( error.getMessage() );
-                }
-            });
+            @Override
+            public void onError(FacebookException error) {
+                showSnackbar( error.getMessage() );
+            }
+        });
 
 
         // GOOGLE SIGN IN
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("")
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                //.requestIdToken("")
                 .requestEmail()
                 .build();
 
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+
+        // TWITTER
+        twitterAuthClient = new TwitterAuthClient();
 
 
         firebase = LibraryClass.getFirebase();
@@ -95,13 +107,10 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
             GoogleSignInResult googleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent( data );
             GoogleSignInAccount account = googleSignInResult.getSignInAccount();
-
-            Log.i("LOG", "Id: "+account.getId());
-            Log.i("LOG", "Email: "+account.getEmail());
-            Log.i("LOG", "Token: "+account.getIdToken());
             syncGoogleSignInToken( account );
         }
         else{
+            twitterAuthClient.onActivityResult( requestCode, resultCode, data );
             callbackManager.onActivityResult( requestCode, resultCode, data );
         }
     }
@@ -111,46 +120,78 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
     private void accessFacebookLoginData(AccessToken accessToken){
         accessLoginData(
-            "facebook",
-            (accessToken != null ? accessToken.getToken() : null)
+                "facebook",
+                (accessToken != null ? accessToken.getToken() : null)
         );
     }
 
     private void accessGoogleLoginData(String accessToken){
         accessLoginData(
-            "google",
-            accessToken
+                "google",
+                accessToken
         );
     }
 
-    private void accessLoginData( String provider, String token ){
-        if( token != null ){
-
-            firebase.authWithOAuthToken(
-                provider,
+    private void accessTwitterLoginData(String token, String secret, String id){
+        accessLoginData(
+                "twitter",
                 token,
-                new Firebase.AuthResultHandler() {
-                    @Override
-                    public void onAuthenticated(AuthData authData) {
-                        user.saveTokenSP( LoginActivity.this, authData.getToken() );
-                        user.saveIdSP( LoginActivity.this, authData.getUid() );
-                        user.setId( authData.getUid() );
-                        user.setName( authData.getProviderData().get("displayName").toString() );
-                        //user.setEmail( authData.getProviderData().get("email").toString() );
-                        user.saveDB();
+                secret,
+                id
+        );
+    }
 
-                        callMainActivity();
-                    }
+    private void accessLoginData( String provider, String... tokens ){
+        if( tokens != null
+                && tokens.length > 0
+                && tokens[1] != null ){
 
-                    @Override
-                    public void onAuthenticationError(FirebaseError firebaseError) {
-                        showSnackbar( firebaseError.getMessage() );
-                    }
-                });
+            if( tokens.length == 1 ){
+                firebase.authWithOAuthToken(
+                    provider,
+                    tokens[0],
+                    getFirebaseAuthResultHandler()
+                );
+            }
+            else{
+                Map<String, String> options = new HashMap<>();
+                options.put("oauth_token", tokens[0]);
+                options.put("oauth_token_secret", tokens[1]);
+                options.put("user_id", tokens[2]);
+
+                firebase.authWithOAuthToken(
+                    provider,
+                    options,
+                    getFirebaseAuthResultHandler()
+                );
+            }
         }
         else{
             firebase.unauth();
         }
+    }
+
+    private Firebase.AuthResultHandler getFirebaseAuthResultHandler(){
+        Firebase.AuthResultHandler callback = new Firebase.AuthResultHandler() {
+            @Override
+            public void onAuthenticated(AuthData authData) {
+                user.saveTokenSP( LoginActivity.this, authData.getToken() );
+                user.saveIdSP( LoginActivity.this, authData.getUid() );
+                user.setId( authData.getUid() );
+                user.setName( authData.getProviderData().get("displayName").toString() );
+                //user.setEmail( authData.getProviderData().get("email").toString() );
+                user.saveDB();
+
+                callMainActivity();
+            }
+
+            @Override
+            public void onAuthenticationError(FirebaseError firebaseError) {
+                showSnackbar( firebaseError.getMessage() );
+            }
+        };
+
+        return( callback );
     }
 
     private void syncGoogleSignInToken( GoogleSignInAccount googleSignInAccount ){
@@ -217,16 +258,40 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
     public void sendLoginFacebookData( View view ){
         LoginManager
-            .getInstance()
-            .logInWithReadPermissions(
-                this,
-                Arrays.asList("public_profile", "user_friends", "email")
-            );
+                .getInstance()
+                .logInWithReadPermissions(
+                        this,
+                        Arrays.asList("public_profile", "user_friends", "email")
+                );
     }
 
     public void sendLoginGoogleData( View view ){
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
+    }
+
+    public void sendLoginTwitterData( View view ){
+
+        twitterAuthClient.authorize(
+            this,
+            new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
+
+                    TwitterSession session = result.data;
+
+                    accessTwitterLoginData(
+                        session.getAuthToken().token,
+                        session.getAuthToken().secret,
+                        String.valueOf( session.getUserId() )
+                    );
+                }
+                @Override
+                public void failure(TwitterException exception) {
+                    showSnackbar( exception.getMessage() );
+                }
+            }
+        );
     }
 
 
@@ -241,19 +306,19 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
             if( !user.getTokenSP(this).isEmpty() ){
                 firebase.authWithPassword(
-                    "password",
-                    user.getTokenSP(this),
-                    new Firebase.AuthResultHandler() {
-                        @Override
-                        public void onAuthenticated(AuthData authData) {
-                            user.saveTokenSP( LoginActivity.this, authData.getToken() );
-                            user.saveIdSP( LoginActivity.this, authData.getUid() );
-                            callMainActivity();
-                        }
+                        "password",
+                        user.getTokenSP(this),
+                        new Firebase.AuthResultHandler() {
+                            @Override
+                            public void onAuthenticated(AuthData authData) {
+                                user.saveTokenSP( LoginActivity.this, authData.getToken() );
+                                user.saveIdSP( LoginActivity.this, authData.getUid() );
+                                callMainActivity();
+                            }
 
-                        @Override
-                        public void onAuthenticationError(FirebaseError firebaseError) {}
-                    }
+                            @Override
+                            public void onAuthenticationError(FirebaseError firebaseError) {}
+                        }
                 );
             }
         }
@@ -270,23 +335,23 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
     private void verifyLogin(){
         firebase.authWithPassword(
-            user.getEmail(),
-            user.getPassword(),
-            new Firebase.AuthResultHandler() {
-                @Override
-                public void onAuthenticated(AuthData authData) {
-                    user.saveTokenSP( LoginActivity.this, authData.getToken() );
-                    user.saveIdSP( LoginActivity.this, authData.getUid() );
-                    closeProgressBar();
-                    callMainActivity();
-                }
+                user.getEmail(),
+                user.getPassword(),
+                new Firebase.AuthResultHandler() {
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        user.saveTokenSP( LoginActivity.this, authData.getToken() );
+                        user.saveIdSP( LoginActivity.this, authData.getUid() );
+                        closeProgressBar();
+                        callMainActivity();
+                    }
 
-                @Override
-                public void onAuthenticationError(FirebaseError firebaseError) {
-                    showSnackbar( firebaseError.getMessage() );
-                    closeProgressBar();
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        showSnackbar( firebaseError.getMessage() );
+                        closeProgressBar();
+                    }
                 }
-            }
         );
     }
 
