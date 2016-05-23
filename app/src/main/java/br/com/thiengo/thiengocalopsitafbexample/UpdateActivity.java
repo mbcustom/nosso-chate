@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 
-public class UpdateActivity extends AppCompatActivity implements ValueEventListener, Firebase.CompletionListener {
+public class UpdateActivity extends AppCompatActivity implements ValueEventListener, DatabaseReference.CompletionListener {
 
     private Toolbar toolbar;
     private User user;
@@ -55,10 +55,10 @@ public class UpdateActivity extends AppCompatActivity implements ValueEventListe
     }
 
     @Override
-    public void onCancelled(FirebaseError firebaseError) {}
+    public void onCancelled(DatabaseError firebaseError) {}
 
     @Override
-    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+    public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
 
         if( firebaseError != null ){
             Toast.makeText( this, "Falhou: "+firebaseError.getMessage(), Toast.LENGTH_LONG ).show();

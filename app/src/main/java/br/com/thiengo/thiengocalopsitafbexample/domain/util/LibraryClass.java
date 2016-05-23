@@ -3,18 +3,19 @@ package br.com.thiengo.thiengocalopsitafbexample.domain.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.firebase.client.Firebase;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public final class LibraryClass {
     public static String PREF = "br.com.thiengo.thiengocalopsitafbexample.PREF";
-    private static Firebase firebase;
+    private static DatabaseReference firebase;
 
 
     private LibraryClass(){}
 
-    public static Firebase getFirebase(){
+    public static DatabaseReference getFirebase(){
         if( firebase == null ){
-            firebase = new Firebase("https://nosso-chat-fb-thiengo.firebaseio.com");
+            firebase = FirebaseDatabase.getInstance().getReference();
         }
 
         return( firebase );

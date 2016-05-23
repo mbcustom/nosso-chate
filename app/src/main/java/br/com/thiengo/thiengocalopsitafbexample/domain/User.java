@@ -1,10 +1,11 @@
 package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.firebase.client.Firebase;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +13,18 @@ import java.util.Map;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
-@JsonIgnoreProperties({"id", "password", "newPassword"})
+
 public class User {
     public static String TOKEN = "br.com.thiengo.thiengocalopsitafbexample.domain.User.TOKEN";
     public static String ID = "br.com.thiengo.thiengocalopsitafbexample.domain.User.ID";
 
+    @Exclude
     private String id;
     private String name;
     private String email;
+    @Exclude
     private String password;
+    @Exclude
     private String newPassword;
 
 
@@ -45,8 +49,8 @@ public class User {
     }
 
     public boolean isSocialNetworkLogged( Context context ){
-        retrieveIdSP( context );
-        return( this.id.contains("facebook") || this.id.contains("google") || this.id.contains("twitter") );
+        String token = getTokenSP( context );
+        return( token.contains("facebook") || token.contains("google") || token.contains("twitter") );
     }
 
 
@@ -114,21 +118,26 @@ public class User {
     public void saveTokenSP(Context context, String token ){
         LibraryClass.saveSP( context, TOKEN, token );
     }
-
     public String getTokenSP(Context context ){
         return( LibraryClass.getSP( context, TOKEN ) );
     }
 
 
 
-    public void saveDB(){
-        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
-        firebase.setValue(this);
+    public void saveDB( DatabaseReference.CompletionListener... completionListener ){
+        DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
+
+        if( completionListener.length == 0 ){
+            firebase.setValue(this);
+        }
+        else{
+            firebase.setValue(this, completionListener[0]);
+        }
     }
 
-    public void updateDB( Firebase.CompletionListener... completionListener ){
+    public void updateDB( DatabaseReference.CompletionListener... completionListener ){
 
-        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+        DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
 
         Map<String, Object> map = new HashMap<>();
         setNameInMap(map);
@@ -137,7 +146,6 @@ public class User {
         if( map.isEmpty() ){
             return;
         }
-
 
         if( completionListener.length > 0 ){
             firebase.updateChildren(map, completionListener[0]);
@@ -148,13 +156,13 @@ public class User {
     }
 
     public void removeDB(){
-        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+        DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
         firebase.setValue(null);
     }
 
     public void contextDataDB( Context context ){
         retrieveIdSP( context );
-        Firebase firebase = LibraryClass.getFirebase().child("users").child( getId() );
+        DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
 
         firebase.addListenerForSingleValueEvent( (ValueEventListener) context );
     }

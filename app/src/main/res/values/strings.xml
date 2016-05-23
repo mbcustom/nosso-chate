@@ -14,6 +14,7 @@
     <string name="action_sign_in_twitter">Sign in com Twitter</string>
     <string name="action_sign_up">Cadastrar</string>
     <string name="action_sign_up_call">Cadastrar</string>
+    <string name="action_reset_call">Recuperar acesso</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="action_sign_up_short">Cadastro</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -24,7 +25,9 @@
         completions."
     </string>
     <string name="update_profile">Atualizar profile</string>
+    <string name="reset">Recuperar acesso</string>
     <string name="update_login">Atualizar login</string>
+    <string name="reset_bt_label">Iniciar recuperação acesso</string>
     <string name="update_password">Atualizar senha</string>
     <string name="remove_user">Remover conta</string>
     <string name="logout">Logout</string>
@@ -34,5 +37,5 @@
     <string name="title_activity_remove_user">RemoveUserActivity</string>
     <string name="password_info">Para prosseguir com a atualização informe abaixo sua senha.</string>
 
-    <string name="facebook_app_id">SEU FACEBOOK APP ID</string>
+    <string name="facebook_app_id"></string>
 </resources>
