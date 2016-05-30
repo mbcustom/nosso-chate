@@ -1,7 +1,6 @@
 package br.com.thiengo.thiengocalopsitafbexample.domain;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
@@ -15,16 +14,14 @@ import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 
 public class User {
-    public static String TOKEN = "br.com.thiengo.thiengocalopsitafbexample.domain.User.TOKEN";
+    public static String PROVIDER = "br.com.thiengo.thiengocalopsitafbexample.domain.User.PROVIDER";
     public static String ID = "br.com.thiengo.thiengocalopsitafbexample.domain.User.ID";
 
-    @Exclude
+
     private String id;
     private String name;
     private String email;
-    @Exclude
     private String password;
-    @Exclude
     private String newPassword;
 
 
@@ -49,8 +46,8 @@ public class User {
     }
 
     public boolean isSocialNetworkLogged( Context context ){
-        String token = getTokenSP( context );
-        return( token.contains("facebook") || token.contains("google") || token.contains("twitter") );
+        String token = getProviderSP( context );
+        return( token.contains("facebook") || token.contains("google") || token.contains("twitter") || token.contains("github") );
     }
 
 
@@ -66,6 +63,12 @@ public class User {
     private void setNameInMap( Map<String, Object> map ) {
         if( getName() != null ){
             map.put( "name", getName() );
+        }
+    }
+
+    public void setNameIfNull(String name) {
+        if( this.name == null ){
+            this.name = name;
         }
     }
 
@@ -85,8 +88,15 @@ public class User {
         }
     }
 
+    public void setEmailIfNull(String email) {
+        if( this.email == null ){
+            this.email = email;
+        }
+
+    }
 
 
+    @Exclude
     public String getPassword() {
         return password;
     }
@@ -100,7 +110,7 @@ public class User {
     }
 
 
-
+    @Exclude
     public String getNewPassword() {
         return newPassword;
     }
@@ -115,11 +125,11 @@ public class User {
 
 
 
-    public void saveTokenSP(Context context, String token ){
-        LibraryClass.saveSP( context, TOKEN, token );
+    public void saveProviderSP(Context context, String token ){
+        LibraryClass.saveSP( context, PROVIDER, token );
     }
-    public String getTokenSP(Context context ){
-        return( LibraryClass.getSP( context, TOKEN ) );
+    public String getProviderSP(Context context ){
+        return( LibraryClass.getSP( context, PROVIDER) );
     }
 
 

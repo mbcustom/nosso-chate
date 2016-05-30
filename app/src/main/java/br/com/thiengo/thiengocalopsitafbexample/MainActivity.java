@@ -4,19 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 
 import br.com.thiengo.thiengocalopsitafbexample.adapter.UserRecyclerAdapter;
+import br.com.thiengo.thiengocalopsitafbexample.adapter.UserViewHolder;
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
+import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
-    //private UserRecyclerAdapter adapter;
+    private UserRecyclerAdapter adapter;
     private FirebaseAuth.AuthStateListener authStateListener;
 
     @Override
@@ -38,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mAuth.addAuthStateListener( authStateListener );
+        databaseReference = LibraryClass.getFirebase();
     }
 
 
@@ -48,23 +55,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
-       /* RecyclerView rvUsers = (RecyclerView) findViewById(R.id.rv_users);
+        RecyclerView rvUsers = (RecyclerView) findViewById(R.id.rv_users);
         rvUsers.setHasFixedSize( true );
         rvUsers.setLayoutManager( new LinearLayoutManager(this));
-
         adapter = new UserRecyclerAdapter(
                 User.class,
                 android.R.layout.two_line_list_item,
                 UserViewHolder.class,
-                firebase );
-
-        rvUsers.setAdapter(adapter);*/
+                databaseReference.child("users") );
+        rvUsers.setAdapter(adapter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //adapter.cleanup();
+        adapter.cleanup();
 
         if( authStateListener != null ){
             mAuth.removeAuthStateListener( authStateListener );

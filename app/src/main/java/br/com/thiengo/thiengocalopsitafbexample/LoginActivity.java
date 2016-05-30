@@ -1,13 +1,20 @@
 package br.com.thiengo.thiengocalopsitafbexample;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import com.alorma.github.sdk.bean.dto.response.Token;
+import com.alorma.github.sdk.services.login.RequestTokenClient;
+import com.alorma.github.sdk.services.user.GetAuthUserClient;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -28,9 +35,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GithubAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.TwitterAuthProvider;
-import com.google.firebase.auth.UserInfo;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -40,6 +47,7 @@ import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import java.util.Arrays;
 
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
+import rx.Observer;
 
 
 public class LoginActivity extends CommonActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -128,7 +136,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener( mAuthListener );
+        verifyLogged();
     }
 
 
@@ -162,6 +170,13 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
         );
     }
 
+    private void accessGithubLoginData(String accessToken){
+        accessLoginData(
+                "github",
+                accessToken
+        );
+    }
+
     private void accessLoginData( String provider, String... tokens ){
         if( tokens != null
                 && tokens.length > 0
@@ -170,8 +185,9 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
             AuthCredential credential = FacebookAuthProvider.getCredential( tokens[0]);
             credential = provider.equalsIgnoreCase("google") ? GoogleAuthProvider.getCredential( tokens[0], null) : credential;
             credential = provider.equalsIgnoreCase("twitter") ? TwitterAuthProvider.getCredential( tokens[0], tokens[1] ) : credential;
+            credential = provider.equalsIgnoreCase("github") ? GithubAuthProvider.getCredential( tokens[0] ) : credential;
 
-            user.saveTokenSP( LoginActivity.this, provider );
+            user.saveProviderSP( LoginActivity.this, provider );
             mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -194,11 +210,14 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
                 FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
 
-                if( userFirebase != null && user.getId() == null ){
+                if( userFirebase != null
+                    && user.getId() == null
+                    && isNameOk( user, userFirebase ) ){
+
                     user.saveIdSP( LoginActivity.this, userFirebase.getUid() );
                     user.setId( userFirebase.getUid() );
-                    user.setName( userFirebase.getDisplayName() );
-                    user.setEmail( userFirebase.getEmail() );
+                    user.setNameIfNull( userFirebase.getDisplayName() );
+                    user.setEmailIfNull( userFirebase.getEmail() );
                     user.saveDB();
 
                     callMainActivity();
@@ -206,6 +225,13 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
             }
         };
         return( callback );
+    }
+
+    private boolean isNameOk( User user, FirebaseUser firebaseUser ){
+        return(
+            user.getName() != null
+            || firebaseUser.getDisplayName() != null
+        );
     }
 
 
@@ -278,6 +304,93 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
         );
     }
 
+    public void sendLoginGithubData( View view ){
+
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .authority("github.com")
+                .appendPath("login")
+                .appendPath("oauth")
+                .appendPath("authorize")
+                .appendQueryParameter("client_id", getString(R.string.github_app_id))
+                .appendQueryParameter("scope", "user,user:email")
+                .build();
+
+        WebView webView = new WebView(this);
+        webView.loadUrl( uri.toString() );
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+                Uri uri = Uri.parse(url);
+
+                if( uri.getQueryParameter("code") != null
+                        && uri.getScheme() != null
+                        && uri.getScheme().equalsIgnoreCase("https") ){
+
+                    requestGitHubUserAccessToken( uri.getQueryParameter("code") );
+                }
+
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+        });
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Login GitHub");
+        alert.setView(webView);
+        alert.show();
+    }
+
+    private void requestGitHubUserAccessToken( String code ){
+        RequestTokenClient requestTokenClient = new RequestTokenClient(
+            code,
+            getString(R.string.github_app_id),
+            getString(R.string.github_app_secret),
+            getString(R.string.github_app_url)
+        );
+
+        requestTokenClient
+            .observable()
+            .subscribe(new Observer<Token>() {
+                @Override
+                public void onCompleted() {}
+
+                @Override
+                public void onError(Throwable e) {
+                    showSnackbar( e.getMessage() );
+                }
+
+                @Override
+                public void onNext(Token token) {
+                    if( token.access_token != null ){
+                        requestGitHubUserData( token.access_token );
+                    }
+                }
+            });
+    }
+
+    private void requestGitHubUserData( final String accessToken ){
+        GetAuthUserClient getAuthUserClient = new GetAuthUserClient( accessToken );
+        getAuthUserClient
+            .observable()
+            .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
+                @Override
+                public void onCompleted() {}
+
+                @Override
+                public void onError(Throwable e) {}
+
+                @Override
+                public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
+                    LoginActivity.this.user.setName( user.name );
+                    LoginActivity.this.user.setEmail( user.email );
+
+                    accessGithubLoginData( accessToken );
+                }
+            });
+
+    }
+
 
 
 
@@ -291,22 +404,31 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
 
 
+    private void verifyLogged(){
+        if( mAuth.getCurrentUser() != null ){
+            callMainActivity();
+        }
+        else{
+            mAuth.addAuthStateListener( mAuthListener );
+        }
+    }
+
     private void verifyLogin(){
-        user.saveTokenSP( LoginActivity.this, "" );
+        user.saveProviderSP( LoginActivity.this, "" );
         mAuth.signInWithEmailAndPassword(
                 user.getEmail(),
                 user.getPassword()
-        )
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+            )
+            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if( !task.isSuccessful() ){
-                            showSnackbar("Login falhou");
-                            return;
-                        }
+                    if( !task.isSuccessful() ){
+                        showSnackbar("Login falhou");
+                        return;
                     }
-                });
+                }
+            });
     }
 
     @Override

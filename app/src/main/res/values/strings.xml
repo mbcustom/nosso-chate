@@ -12,6 +12,7 @@
     <string name="action_sign_in_facebook">Sign in com Facebook</string>
     <string name="action_sign_in_google">Sign in com Google</string>
     <string name="action_sign_in_twitter">Sign in com Twitter</string>
+    <string name="action_sign_in_github">Sign in com GitHub</string>
     <string name="action_sign_up">Cadastrar</string>
     <string name="action_sign_up_call">Cadastrar</string>
     <string name="action_reset_call">Recuperar acesso</string>
@@ -38,4 +39,8 @@
     <string name="password_info">Para prosseguir com a atualização informe abaixo sua senha.</string>
 
     <string name="facebook_app_id"></string>
+
+    <string name="github_app_id">b34116e18d2421649752</string>
+    <string name="github_app_secret">a620999ca02a16a7215aaf6fc82d65ddf38cfc57</string>
+    <string name="github_app_url">https://nosso-chat-firebase-972f1.firebaseapp.com/__/auth/handler</string>
 </resources>
