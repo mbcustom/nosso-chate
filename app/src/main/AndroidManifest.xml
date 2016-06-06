@@ -8,22 +8,23 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <application
+    <application xmlns:tools="http://schemas.android.com/tools"
         android:name=".CustomApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        xmlns:tools="http://schemas.android.com/tools">
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <activity android:name="com.facebook.FacebookActivity"
+        <activity
+            android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:label="@string/app_name"
-            tools:replace="android:theme"/>
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:replace="android:theme" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
@@ -41,25 +42,31 @@
         <activity
             android:name=".ResetActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity" />
+        <activity
+            android:name=".LinkAccountsActivity"
+            android:label="@string/title_activity_link_accounts" />
         <activity
             android:name=".UpdateActivity"
             android:label="@string/title_activity_update"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".UpdateLoginActivity"
             android:label="@string/title_activity_update_login"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".UpdatePasswordActivity"
             android:label="@string/title_activity_update_password"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".RemoveUserActivity"
             android:label="@string/title_activity_remove_user"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="3dc6b3f7c9b49dc77c730868b0ee3ee4530d9966" />
     </application>
+
 </manifest>

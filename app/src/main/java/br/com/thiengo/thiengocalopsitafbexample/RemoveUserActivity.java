@@ -17,11 +17,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 
-public class RemoveUserActivity extends AppCompatActivity implements ValueEventListener {
+public class RemoveUserActivity extends AppCompatActivity
+        implements ValueEventListener, DatabaseReference.CompletionListener {
 
     private Toolbar toolbar;
     private User user;
@@ -49,12 +51,12 @@ public class RemoveUserActivity extends AppCompatActivity implements ValueEventL
         password = (EditText) findViewById(R.id.password);
 
         user = new User();
+        user.setId( mAuth.getCurrentUser().getUid() );
         user.contextDataDB( this );
     }
 
     public void update( View view ){
         user.setPassword( password.getText().toString() );
-        user.generateCryptPassword();
 
         reauthenticate();
     }
@@ -107,26 +109,19 @@ public class RemoveUserActivity extends AppCompatActivity implements ValueEventL
                     return;
                 }
 
-                user.retrieveIdSP( RemoveUserActivity.this );
-                user.removeDB();
-                Toast.makeText(
-                        RemoveUserActivity.this,
-                        "Conta removida com sucesso",
-                        Toast.LENGTH_SHORT
-                ).show();
-                finish();
+                user.removeDB( RemoveUserActivity.this );
             }
         })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(
-                                RemoveUserActivity.this,
-                                e.getMessage(),
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
-                });
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(
+                        RemoveUserActivity.this,
+                        e.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
     }
 
     @Override
@@ -137,4 +132,14 @@ public class RemoveUserActivity extends AppCompatActivity implements ValueEventL
 
     @Override
     public void onCancelled(DatabaseError firebaseError) {}
+
+    @Override
+    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+        Toast.makeText(
+                RemoveUserActivity.this,
+                "Conta removida com sucesso",
+                Toast.LENGTH_SHORT
+        ).show();
+        finish();
+    }
 }

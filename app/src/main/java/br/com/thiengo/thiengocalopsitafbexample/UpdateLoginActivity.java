@@ -52,13 +52,13 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
         password = (EditText) findViewById(R.id.password);
 
         user = new User();
+        user.setId( mAuth.getCurrentUser().getUid() );
         user.contextDataDB( this );
     }
 
     public void update( View view ){
 
         user.setPassword( password.getText().toString() );
-        user.generateCryptPassword();
 
         reauthenticate();
     }
@@ -98,7 +98,6 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
 
     private void updateData(){
         user.setPassword( password.getText().toString() );
-        user.generateCryptPassword();
 
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
 

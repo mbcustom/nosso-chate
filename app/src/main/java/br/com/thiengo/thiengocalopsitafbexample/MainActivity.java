@@ -104,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         else if(id == R.id.action_update_password){
             startActivity(new Intent(this, UpdatePasswordActivity.class));
         }
+        else if(id == R.id.action_link_accounts){
+            startActivity(new Intent(this, LinkAccountsActivity.class));
+        }
         else if(id == R.id.action_remove_user){
             startActivity(new Intent(this, RemoveUserActivity.class));
         }

@@ -49,15 +49,15 @@ public class UpdatePasswordActivity extends AppCompatActivity implements ValueEv
         toolbar.setTitle( getResources().getString(R.string.update_password) );
         newPassword = (EditText) findViewById(R.id.new_password);
         password = (EditText) findViewById(R.id.password);
+
         user = new User();
+        user.setId( mAuth.getCurrentUser().getUid() );
         user.contextDataDB( this );
     }
 
     public void update( View view ){
         user.setNewPassword( newPassword.getText().toString() );
-        user.generateCryptNewPassword();
         user.setPassword( password.getText().toString() );
-        user.generateCryptPassword();
 
         reauthenticate();
     }
@@ -97,9 +97,7 @@ public class UpdatePasswordActivity extends AppCompatActivity implements ValueEv
 
     private void updateData(){
         user.setNewPassword( newPassword.getText().toString() );
-        user.generateCryptNewPassword();
         user.setPassword( password.getText().toString() );
-        user.generateCryptPassword();
 
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
@@ -108,33 +106,33 @@ public class UpdatePasswordActivity extends AppCompatActivity implements ValueEv
         }
 
         firebaseUser
-                .updatePassword( user.getNewPassword() )
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+            .updatePassword( user.getNewPassword() )
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
 
-                        if( task.isSuccessful() ){
-                            newPassword.setText("");
-                            password.setText("");
+                    if( task.isSuccessful() ){
+                        newPassword.setText("");
+                        password.setText("");
 
-                            Toast.makeText(
-                                    UpdatePasswordActivity.this,
-                                    "Senha atualizada com sucesso",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
                         Toast.makeText(
                                 UpdatePasswordActivity.this,
-                                e.getMessage(),
+                                "Senha atualizada com sucesso",
                                 Toast.LENGTH_SHORT
                         ).show();
                     }
-                });
+                }
+            })
+            .addOnFailureListener(this, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(
+                            UpdatePasswordActivity.this,
+                            e.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
     }
 
     @Override

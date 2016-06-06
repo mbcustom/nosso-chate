@@ -9,13 +9,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.thiengo.thiengocalopsitafbexample.domain.util.CryptWithMD5;
 import br.com.thiengo.thiengocalopsitafbexample.domain.util.LibraryClass;
 
 
 public class User {
     public static String PROVIDER = "br.com.thiengo.thiengocalopsitafbexample.domain.User.PROVIDER";
-    public static String ID = "br.com.thiengo.thiengocalopsitafbexample.domain.User.ID";
 
 
     private String id;
@@ -35,14 +33,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void saveIdSP(Context context, String token ){
-        LibraryClass.saveSP( context, ID, token );
-    }
-
-    public void retrieveIdSP(Context context ){
-        this.id = LibraryClass.getSP( context, ID );
     }
 
     public boolean isSocialNetworkLogged( Context context ){
@@ -105,9 +95,6 @@ public class User {
         this.password = password;
     }
 
-    public void generateCryptPassword() {
-        password = CryptWithMD5.cryptWithMD5(password);
-    }
 
 
     @Exclude
@@ -119,9 +106,6 @@ public class User {
         this.newPassword = newPassword;
     }
 
-    public void generateCryptNewPassword() {
-        newPassword = CryptWithMD5.cryptWithMD5(newPassword);
-    }
 
 
 
@@ -165,13 +149,13 @@ public class User {
         }
     }
 
-    public void removeDB(){
+    public void removeDB( DatabaseReference.CompletionListener completionListener ){
+
         DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
-        firebase.setValue(null);
+        firebase.setValue(null, completionListener);
     }
 
     public void contextDataDB( Context context ){
-        retrieveIdSP( context );
         DatabaseReference firebase = LibraryClass.getFirebase().child("users").child( getId() );
 
         firebase.addListenerForSingleValueEvent( (ValueEventListener) context );

@@ -1,6 +1,8 @@
 package br.com.thiengo.thiengocalopsitafbexample.adapter;
+
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
+
 import br.com.thiengo.thiengocalopsitafbexample.domain.User;
 
 public class UserRecyclerAdapter extends FirebaseRecyclerAdapter<User, UserViewHolder> {

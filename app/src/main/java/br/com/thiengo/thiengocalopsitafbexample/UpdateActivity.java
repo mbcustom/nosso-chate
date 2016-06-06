@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,12 +39,14 @@ public class UpdateActivity extends AppCompatActivity implements ValueEventListe
     private void init(){
         toolbar.setTitle( getResources().getString(R.string.update_profile) );
         name = (AutoCompleteTextView) findViewById(R.id.name);
+
         user = new User();
+        user.setId( FirebaseAuth.getInstance().getCurrentUser().getUid() );
         user.contextDataDB( this );
     }
 
     public void update( View view ){
-        user.retrieveIdSP( UpdateActivity.this );
+        user.setId(FirebaseAuth.getInstance().getCurrentUser().getUid() );
         user.setName( name.getText().toString() );
         user.updateDB( UpdateActivity.this );
     }
