@@ -8,6 +8,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,12 +59,15 @@ public class UpdateActivity extends AppCompatActivity implements ValueEventListe
     }
 
     @Override
-    public void onCancelled(DatabaseError firebaseError) {}
+    public void onCancelled(DatabaseError firebaseError) {
+        FirebaseCrash.report( firebaseError.toException() );
+    }
 
     @Override
     public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
 
         if( firebaseError != null ){
+            FirebaseCrash.report( firebaseError.toException() );
             Toast.makeText( this, "Falhou: "+firebaseError.getMessage(), Toast.LENGTH_LONG ).show();
         }
         else{

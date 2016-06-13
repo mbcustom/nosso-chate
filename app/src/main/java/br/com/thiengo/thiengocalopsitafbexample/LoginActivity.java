@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -29,6 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -38,7 +40,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GithubAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.TwitterAuthProvider;
-import com.google.firebase.auth.UserInfo;
+import com.google.firebase.crash.FirebaseCrash;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -65,6 +67,8 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     private TwitterAuthClient twitterAuthClient;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,22 +88,21 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
             @Override
             public void onError(FacebookException error) {
+                FirebaseCrash.report( error );
                 showSnackbar( error.getMessage() );
             }
         });
 
-
         // GOOGLE SIGN IN
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("312301797686-1bkt0nbecnbctpfoflanjr3sp4fi0aec.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
+            .requestIdToken("312301797686-1bkt0nbecnbctpfoflanjr3sp4fi0aec.apps.googleusercontent.com")
+            .requestEmail()
+            .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
 
         // TWITTER
         twitterAuthClient = new TwitterAuthClient();
@@ -133,13 +136,11 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
         }
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
         verifyLogged();
     }
-
 
     @Override
     protected void onStop() {
@@ -148,6 +149,10 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
             mAuth.removeAuthStateListener( mAuthListener );
         }
     }
+
+
+
+
 
     private void accessFacebookLoginData(AccessToken accessToken){
         accessLoginData(
@@ -189,15 +194,22 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
             credential = provider.equalsIgnoreCase("github") ? GithubAuthProvider.getCredential( tokens[0] ) : credential;
 
             user.saveProviderSP( LoginActivity.this, provider );
-            mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+            mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
 
-                    if( !task.isSuccessful() ){
-                        showSnackbar("Login social falhou");
+                        if( !task.isSuccessful() ){
+                            showSnackbar("Login social falhou");
+                        }
                     }
-                }
-            });
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        FirebaseCrash.report( e );
+                    }
+                });
         }
         else{
             mAuth.signOut();
@@ -240,6 +252,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
 
 
+
     protected void initViews(){
         email = (AutoCompleteTextView) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -263,12 +276,14 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     }
 
     public void sendLoginData( View view ){
+        FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginData()");
         openProgressBar();
         initUser();
         verifyLogin();
     }
 
     public void sendLoginFacebookData( View view ){
+        FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginFacebookData()");
         LoginManager
                 .getInstance()
                 .logInWithReadPermissions(
@@ -278,12 +293,15 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     }
 
     public void sendLoginGoogleData( View view ){
+
+        FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginGoogleData()");
+
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
     }
 
     public void sendLoginTwitterData( View view ){
-
+        FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginTwitterData()");
         twitterAuthClient.authorize(
                 this,
                 new Callback<TwitterSession>() {
@@ -300,6 +318,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
                     }
                     @Override
                     public void failure(TwitterException exception) {
+                        FirebaseCrash.report( exception );
                         showSnackbar( exception.getMessage() );
                     }
                 }
@@ -307,7 +326,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     }
 
     public void sendLoginGithubData( View view ){
-
+        FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginGithubData()");
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .authority("github.com")
@@ -359,6 +378,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
                     @Override
                     public void onError(Throwable e) {
+                        FirebaseCrash.report( e );
                         showSnackbar( e.getMessage() );
                     }
 
@@ -380,7 +400,9 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        FirebaseCrash.report( e );
+                    }
 
                     @Override
                     public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
@@ -406,6 +428,7 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
 
 
+
     private void verifyLogged(){
         if( mAuth.getCurrentUser() != null ){
             callMainActivity();
@@ -416,25 +439,33 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     }
 
     private void verifyLogin(){
+
+        FirebaseCrash.log("LoginActivity:verifyLogin()");
         user.saveProviderSP( LoginActivity.this, "" );
         mAuth.signInWithEmailAndPassword(
                 user.getEmail(),
                 user.getPassword()
         )
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if( !task.isSuccessful() ){
-                            showSnackbar("Login falhou");
-                            return;
-                        }
-                    }
-                });
+                if( !task.isSuccessful() ){
+                    showSnackbar("Login falhou");
+                    return;
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                FirebaseCrash.report( e );
+            }
+        });
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        FirebaseCrash.report( new Exception( connectionResult.getErrorCode()+": "+connectionResult.getErrorMessage() ) );
         showSnackbar( connectionResult.getErrorMessage() );
     }
 }

@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.alorma.github.sdk.bean.dto.response.Email;
 import com.alorma.github.sdk.bean.dto.response.Token;
 import com.alorma.github.sdk.services.login.RequestTokenClient;
 import com.alorma.github.sdk.services.user.GetAuthUserClient;
@@ -39,11 +38,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GithubAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.TwitterAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.twitter.sdk.android.core.Callback;
@@ -210,6 +209,8 @@ public class LinkAccountsActivity extends CommonActivity
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        FirebaseCrash.report( e );
+
                         closeProgressBar();
                         closeGitHubDialog();
 
@@ -339,11 +340,11 @@ public class LinkAccountsActivity extends CommonActivity
         }
 
         LoginManager
-                .getInstance()
-                .logInWithReadPermissions(
-                        this,
-                        Arrays.asList("public_profile", "user_friends", "email")
-                );
+            .getInstance()
+            .logInWithReadPermissions(
+                    this,
+                    Arrays.asList("public_profile", "user_friends", "email")
+            );
     }
 
     public void sendLoginGoogleData( View view ){
@@ -379,6 +380,7 @@ public class LinkAccountsActivity extends CommonActivity
                     }
                     @Override
                     public void failure(TwitterException exception) {
+                        FirebaseCrash.report( exception );
                         showSnackbar( exception.getMessage() );
                     }
                 }
@@ -443,6 +445,7 @@ public class LinkAccountsActivity extends CommonActivity
 
                     @Override
                     public void onError(Throwable e) {
+                        FirebaseCrash.report( e );
                         showSnackbar( e.getMessage() );
                     }
 
@@ -464,7 +467,9 @@ public class LinkAccountsActivity extends CommonActivity
                     public void onCompleted() {}
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        FirebaseCrash.report( e );
+                    }
 
                     @Override
                     public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
@@ -482,11 +487,16 @@ public class LinkAccountsActivity extends CommonActivity
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        FirebaseCrash.report( new Exception( connectionResult.getErrorMessage() ) );
         showSnackbar( connectionResult.getErrorMessage() );
     }
 
     @Override
     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+        if( databaseError != null ){
+            FirebaseCrash.report( databaseError.toException() );
+        }
+
         mAuth.getCurrentUser().delete();
         mAuth.signOut();
         finish();
@@ -517,6 +527,7 @@ public class LinkAccountsActivity extends CommonActivity
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    FirebaseCrash.report( e );
                     showSnackbar("Error: "+e.getMessage());
                 }
             });

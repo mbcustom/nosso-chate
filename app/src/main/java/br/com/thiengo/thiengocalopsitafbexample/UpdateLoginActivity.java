@@ -16,6 +16,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -76,24 +77,26 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
         );
 
         firebaseUser.reauthenticate( credential )
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
 
-                        if( task.isSuccessful() ){
-                            updateData();
-                        }
+                    if( task.isSuccessful() ){
+                        updateData();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(
-                        UpdateLoginActivity.this,
-                        e.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
-            }
-        });
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    FirebaseCrash.report( e );
+                    Toast.makeText(
+                            UpdateLoginActivity.this,
+                            e.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
     }
 
     private void updateData(){
@@ -106,33 +109,34 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
         }
 
         firebaseUser
-                .updateEmail( newEmail.getText().toString() )
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+            .updateEmail( newEmail.getText().toString() )
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
 
-                        if( task.isSuccessful() ){
-                            user.setEmail( newEmail.getText().toString() );
-                            user.updateDB();
+                    if( task.isSuccessful() ){
+                        user.setEmail( newEmail.getText().toString() );
+                        user.updateDB();
 
-                            Toast.makeText(
-                                    UpdateLoginActivity.this,
-                                    "Email de login atualizado com sucesso",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
                         Toast.makeText(
                                 UpdateLoginActivity.this,
-                                e.getMessage(),
+                                "Email de login atualizado com sucesso",
                                 Toast.LENGTH_SHORT
                         ).show();
                     }
-                });
+                }
+            })
+            .addOnFailureListener(this, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    FirebaseCrash.report( e );
+                    Toast.makeText(
+                            UpdateLoginActivity.this,
+                            e.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
     }
 
     @Override
@@ -143,5 +147,7 @@ public class UpdateLoginActivity extends AppCompatActivity implements ValueEvent
     }
 
     @Override
-    public void onCancelled(DatabaseError firebaseError) {}
+    public void onCancelled(DatabaseError firebaseError) {
+        FirebaseCrash.report( firebaseError.toException() );
+    }
 }

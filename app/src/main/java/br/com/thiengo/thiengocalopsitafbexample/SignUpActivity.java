@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
@@ -99,9 +100,11 @@ public class SignUpActivity extends CommonActivity implements DatabaseReference.
                     closeProgressBar();
                 }
             }
-        }).addOnFailureListener(this, new OnFailureListener() {
+        })
+        .addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                FirebaseCrash.report( e );
                 showSnackbar( e.getMessage() );
             }
         });
