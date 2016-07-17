@@ -41,6 +41,8 @@ import com.google.firebase.auth.GithubAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.TwitterAuthProvider;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -285,11 +287,11 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     public void sendLoginFacebookData( View view ){
         FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginFacebookData()");
         LoginManager
-                .getInstance()
-                .logInWithReadPermissions(
-                        this,
-                        Arrays.asList("public_profile", "user_friends", "email")
-                );
+            .getInstance()
+            .logInWithReadPermissions(
+                    this,
+                    Arrays.asList("public_profile", "user_friends", "email")
+            );
     }
 
     public void sendLoginGoogleData( View view ){
@@ -303,25 +305,25 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
     public void sendLoginTwitterData( View view ){
         FirebaseCrash.log("LoginActivity:clickListener:button:sendLoginTwitterData()");
         twitterAuthClient.authorize(
-                this,
-                new Callback<TwitterSession>() {
-                    @Override
-                    public void success(Result<TwitterSession> result) {
+            this,
+            new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
 
-                        TwitterSession session = result.data;
+                    TwitterSession session = result.data;
 
-                        accessTwitterLoginData(
-                                session.getAuthToken().token,
-                                session.getAuthToken().secret,
-                                String.valueOf( session.getUserId() )
-                        );
-                    }
-                    @Override
-                    public void failure(TwitterException exception) {
-                        FirebaseCrash.report( exception );
-                        showSnackbar( exception.getMessage() );
-                    }
+                    accessTwitterLoginData(
+                            session.getAuthToken().token,
+                            session.getAuthToken().secret,
+                            String.valueOf( session.getUserId() )
+                    );
                 }
+                @Override
+                public void failure(TwitterException exception) {
+                    FirebaseCrash.report( exception );
+                    showSnackbar( exception.getMessage() );
+                }
+            }
         );
     }
 
@@ -371,47 +373,47 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
         );
 
         requestTokenClient
-                .observable()
-                .subscribe(new Observer<Token>() {
-                    @Override
-                    public void onCompleted() {}
+            .observable()
+            .subscribe(new Observer<Token>() {
+                @Override
+                public void onCompleted() {}
 
-                    @Override
-                    public void onError(Throwable e) {
-                        FirebaseCrash.report( e );
-                        showSnackbar( e.getMessage() );
-                    }
+                @Override
+                public void onError(Throwable e) {
+                    FirebaseCrash.report( e );
+                    showSnackbar( e.getMessage() );
+                }
 
-                    @Override
-                    public void onNext(Token token) {
-                        if( token.access_token != null ){
-                            requestGitHubUserData( token.access_token );
-                        }
+                @Override
+                public void onNext(Token token) {
+                    if( token.access_token != null ){
+                        requestGitHubUserData( token.access_token );
                     }
-                });
+                }
+            });
     }
 
     private void requestGitHubUserData( final String accessToken ){
         GetAuthUserClient getAuthUserClient = new GetAuthUserClient( accessToken );
         getAuthUserClient
-                .observable()
-                .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
-                    @Override
-                    public void onCompleted() {}
+            .observable()
+            .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
+                @Override
+                public void onCompleted() {}
 
-                    @Override
-                    public void onError(Throwable e) {
-                        FirebaseCrash.report( e );
-                    }
+                @Override
+                public void onError(Throwable e) {
+                    FirebaseCrash.report( e );
+                }
 
-                    @Override
-                    public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
-                        LoginActivity.this.user.setName( user.name );
-                        LoginActivity.this.user.setEmail( user.email );
+                @Override
+                public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
+                    LoginActivity.this.user.setName( user.name );
+                    LoginActivity.this.user.setEmail( user.email );
 
-                        accessGithubLoginData( accessToken );
-                    }
-                });
+                    accessGithubLoginData( accessToken );
+                }
+            });
 
     }
 
@@ -465,7 +467,12 @@ public class LoginActivity extends CommonActivity implements GoogleApiClient.OnC
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        FirebaseCrash.report( new Exception( connectionResult.getErrorCode()+": "+connectionResult.getErrorMessage() ) );
+        FirebaseCrash
+            .report(
+                new Exception(
+                    connectionResult.getErrorCode()+": "+connectionResult.getErrorMessage()
+                )
+            );
         showSnackbar( connectionResult.getErrorMessage() );
     }
 }

@@ -48,6 +48,7 @@
     <string name="title_activity_update_password">UpdatePasswordActivity</string>
     <string name="title_activity_link_accounts">Link contas</string>
     <string name="title_activity_remove_user">RemoveUserActivity</string>
+    <string name="title_activity_notification">Notifications Firebase</string>
     <string name="password_info">Para prosseguir com a atualização informe abaixo sua senha.</string>
 
     <string name="facebook_app_id">1832554003634047</string>
@@ -55,4 +56,11 @@
     <string name="github_app_id"></string>
     <string name="github_app_secret"></string>
     <string name="github_app_url"></string>
+    <string name="chk_topics">Topics</string>
+    <string name="chk_soccer">Futebol</string>
+    <string name="chk_basketball">Basquete</string>
+    <string name="chk_volley">Volei</string>
+    <string name="chk_swimming">Natação</string>
+    <string name="chk_news">Notícias gerais</string>
+    <string name="chk_unique_token">Unique token id</string>
 </resources>

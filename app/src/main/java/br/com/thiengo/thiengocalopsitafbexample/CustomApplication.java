@@ -16,11 +16,19 @@ public class CustomApplication extends Application {
     private static final String TWITTER_KEY = "";
     private static final String TWITTER_SECRET = "";
 
-
     @Override
     public void onCreate() {
         super.onCreate();
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
+
+        /*SharedPreferences sp = getSharedPreferences("SP_TEST", MODE_PRIVATE);
+        int value = sp.getInt("count", 0);
+
+        Log.i("LOG", "Value: "+value);
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("count", value + 1 );
+        editor.apply();*/
     }
 }
