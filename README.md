@@ -56,8 +56,6 @@ Caso você queira ter o projeto de exemplo ainda mais atual, isso em relação �
 
 Caso você queira isso, então será necessário atualiza-lo para o AndroidX. Algo simples de fazer, que exige poucos cliques no Android Studio IDE, exatamente como apresentado em: [Migrar para o AndroidX](https://developer.android.com/jetpack/androidx/migrate?hl=pt-br).
 
-De qualquer forma, mesmo sem a atualização para o AndroidX o projeto deverá rodar sem problemas.
-
 ## Dúvidas e dicas
 
 Caso você tenha dúvidas ou dicas sobre o Firebase Android ou sobre o projeto de exemplo, então [entre em contato](https://www.thiengo.com.br/contato) ou deixe seu comentário em algum dos artigos aula.
