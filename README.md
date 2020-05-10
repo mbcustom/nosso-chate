@@ -1,6 +1,6 @@
 # Nosso Chat - Firebase App (Java Android)
 
-Projeto Java Android da série de artigos sobre a construção de um aplicativo Android com APIs do pacote Firebase. Série do Blog [Thiengo.com.br](https://www.thiengo.com.br).
+Projeto Java Android da série de artigos sobre a construção de um Chat Android com APIs do pacote Firebase. Série do Blog [Thiengo.com.br](https://www.thiengo.com.br).
 
 A principal proposta dessa série de artigos é apresentar em detalhes as principais APIs Firebase que aceleram o desenvolvimento de aplicativos Android, aplicativos dos mais simples aos mais complexos.
 
