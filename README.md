@@ -36,7 +36,7 @@ A ordem a ser seguida é exatamente a mesma ordem apresentada abaixo:
 
 11. [Crash Reporting, Firebase Android - Parte 11](https://www.thiengo.com.br/crash-reporting-firebase-android-parte-11);
 
-12. [Notificação de Engajamento Pelo Firebase Console - Parte 12](https://www.thiengo.com.br/notificacao-de-engajamento-pelo-firebase-console-parte-12).
+12. [Notificação de Engajamento Pelo Firebase Console - Parte 12](https://www.thiengo.com.br/notificacao-de-engajamento-pelo-firebase-console-parte-12) - este conteúdo tem também o próprio [projeto Android em repositório GitHub](https://github.com/viniciusthiengo/FirebaseNotification).
 
 ### Projeto mais atual ⚠
 
